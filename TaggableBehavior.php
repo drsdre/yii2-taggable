@@ -16,6 +16,7 @@
 namespace sjaakp\taggable;
 
 use yii\base\Behavior;
+use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
@@ -83,6 +84,7 @@ class TaggableBehavior extends Behavior {
 
     /**
      * @return ActiveQuery
+     * @throws Exception
      * ActiveQuery to query for associated Tags.
      */
     public function getTags()   {
@@ -97,6 +99,9 @@ class TaggableBehavior extends Behavior {
          * @var $tc ActiveRecord
          */
         $tc = $this->tagClass;
+        if (count($tc::primaryKey())==0) {
+		    throw new Exception('No primary key defined for tag model '.$tc);
+	    }
         $tpk = current($tc::primaryKey());
 
         $tkn = new Expression($owner->getDb()->quoteSql("[[j]].{{{$this->tagKeyAttribute}}}"));
